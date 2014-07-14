@@ -80,7 +80,7 @@ class Print_Sol_Count:
     def __init__(self):
         self.count = 0
 
-    def __call__(self, sol):
+    def __call__(self, _):
         self.count += 1
 
 
