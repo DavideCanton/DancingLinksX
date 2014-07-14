@@ -38,8 +38,8 @@ import itertools as it
 
 import numpy as np
 
-from dl_matrix import DL_Matrix
-from alg_x import Algorithm_X
+from dlmatrix import DLMatrix
+from alg_x import AlgorithmX
 from sudoku_board import Sudoku_Board
 
 
@@ -82,6 +82,7 @@ class GetFirstSol:
         matrix = np.zeros((9, 9), dtype=np.uint8)
 
         for v in sol.values():
+            i, j, val = 0, 0, 0
             for el in v:
                 if el[2] == "#":
                     val = int(el[3])
@@ -97,12 +98,12 @@ class CountSolutions:
     def __init__(self):
         self.count = 0
 
-    def __call__(self, sol):
+    def __call__(self, _):
         self.count += 1
 
 
-if __name__ == "__main__":
-    matrix = DL_Matrix(column_names())
+def main():
+    matrix = DLMatrix(column_names())
 
     # init with known cells, maybe could be loaded from a file!
     known = {(1, 1): 4, (1, 2): 5, (1, 3): 6, (1, 4): 1,
@@ -122,9 +123,13 @@ if __name__ == "__main__":
     matrix.end_add()
 
     sol = GetFirstSol()
-    alg = Algorithm_X(matrix, sol)
+    alg = AlgorithmX(matrix, sol)
     alg()
 
     board = Sudoku_Board(sol.sol)
     print(board)
     print(board.valid())
+
+
+if __name__ == "__main__":
+    main()

@@ -76,7 +76,7 @@ class HeaderCell(Cell):
         self.name = name
 
 
-class DL_Matrix:
+class DLMatrix:
     """
     Dancing Links sparse matrix implementation.
     It stores a circular doubly linked list of 1s, and another list
@@ -285,7 +285,7 @@ class DL_Matrix:
         c.R.L = c.L.R = c
 
 
-if __name__ == "__main__":
+def main():
     def from_dense(row):
         return [i for i, el in enumerate(row) if el]
 
@@ -296,7 +296,7 @@ if __name__ == "__main__":
          from_dense([0, 1, 1, 0, 0, 1, 1]),
          from_dense([0, 1, 0, 0, 0, 0, 1])]
 
-    d = DL_Matrix("1234567")
+    d = DLMatrix("1234567")
 
     for row in r:
         d.add_sparse_row(row, already_sorted=True)
@@ -310,3 +310,7 @@ if __name__ == "__main__":
 
     d.cover(mc)
     print(d)
+
+
+if __name__ == '__main__':
+    main()

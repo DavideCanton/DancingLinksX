@@ -48,8 +48,7 @@ class Sudoku_Board:
             self._board = np.array(m, dtype=np.uint8)
         else:
             self._board = np.zeros((9, 9), dtype=np.uint8)
-        self.squares = as_strided(self._board, shape=(3, 3, 3, 3),
-                                  strides=(27, 3, 9, 1))
+        self.squares = as_strided(self._board, shape=(3, 3, 3, 3), strides=(27, 3, 9, 1))
 
     def all_filled(self):
         """
@@ -90,7 +89,8 @@ class Sudoku_Board:
         else:
             raise ValueError("Invalid position")
 
-    def _valid_position(self, pos):
+    @staticmethod
+    def _valid_position(pos):
         return all(0 <= i <= 8 for i in pos)
 
     def valid(self):
@@ -102,12 +102,15 @@ class Sudoku_Board:
             u = np.unique(self._board[i, :])
             if u.shape[0] < 9 or np.count_nonzero(u) < 9:
                 return False
+
             u = np.unique(self._board[:, i])
             if u.shape[0] < 9 or np.count_nonzero(u) < 9:
                 return False
+
             u = np.unique(self.squares[divmod(i, 3)])
             if u.shape[0] < 9 or np.count_nonzero(u) < 9:
                 return False
+
         return True
 
     def __str__(self):

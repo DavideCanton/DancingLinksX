@@ -34,41 +34,41 @@ __author__ = 'Davide Canton'
 # N-queens solver using Dancing Links.
 #
 
-from dl_matrix import DL_Matrix
-from alg_x import Algorithm_X
+from dlmatrix import DLMatrix
+from alg_x import AlgorithmX
 
 
-def get_names(N):
-    for i in range(N):
+def get_names(n):
+    for i in range(n):
         yield "R{}".format(i)
-    for i in range(N):
+    for i in range(n):
         yield "F{}".format(i)
-    for i in range(2 * N - 1):
+    for i in range(2 * n - 1):
         yield "A{}".format(i), False  # secondary column
-    for i in range(2 * N - 1):
+    for i in range(2 * n - 1):
         yield "B{}".format(i), False  # secondary column
 
 
-def compute_row(i, j, N):
+def compute_row(i, j, n):
     # R is 0 .. N-1
     # F is N .. 2*N-1
     # A is 2*N .. 4*N - 2
     # B is 4*N - 1 .. 6*N - 3
-    return [i, N + j, 2 * N + i + j, 5 * N - 2 - i + j]
+    return [i, n + j, 2 * n + i + j, 5 * n - 2 - i + j]
 
 
 class PrintFirstSol:
-    def __init__(self, N):
-        self.N = N
+    def __init__(self, n):
+        self.n = n
 
     def __call__(self, sol):
-        pos = [0] * self.N
+        pos = [0] * self.n
         for v in sol.values():
             v.sort()
             c, r = map(int, [v[2][1:], v[3][1:]])
             pos[r] = c
-        for i in range(self.N):
-            r = [" "] * self.N
+        for i in range(self.n):
+            r = [" "] * self.n
             r[pos[i]] = "O"
             inner = "|".join(r)
             print("|{}|".format(inner))
@@ -76,24 +76,28 @@ class PrintFirstSol:
         return True
 
 
-class Print_Sol_Count:
+class PrintSolCount:
     def __init__(self):
         self.count = 0
 
-    def __call__(self, sol):
+    def __call__(self, _):
         self.count += 1
 
 
-if __name__ == "__main__":
-    N = 13
+def main():
+    n = 8
 
-    d = DL_Matrix(get_names(N))
+    d = DLMatrix(get_names(n))
 
-    for i in range(N):
-        for j in range(N):
-            row = compute_row(i, j, N)
+    for i in range(n):
+        for j in range(n):
+            row = compute_row(i, j, n)
             d.add_sparse_row(row, already_sorted=True)
     d.end_add()
 
-    p = PrintFirstSol(N)
-    Algorithm_X(d, p)()
+    p = PrintFirstSol(n)
+    AlgorithmX(d, p)()
+
+
+if __name__ == '__main__':
+    main()

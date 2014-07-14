@@ -35,10 +35,10 @@ __author__ = 'Davide Canton'
 # (http://arxiv.org/abs/cs/0011047).
 #
 
-from dl_matrix import DL_Matrix
+from dlmatrix import DLMatrix
 
 
-class Algorithm_X:
+class AlgorithmX:
     """
     Callable object implementing the Algorithm X.
     """
@@ -126,7 +126,7 @@ class Algorithm_X:
         return sol
 
 
-if __name__ == "__main__":
+def main():
     def from_dense(row):
         return [i for i, el in enumerate(row) if el]
 
@@ -137,7 +137,7 @@ if __name__ == "__main__":
          from_dense([0, 1, 0, 0, 0, 0, 1]),
          from_dense([0, 0, 0, 1, 1, 0, 1])]
 
-    d = DL_Matrix("ABCDEFG")
+    d = DLMatrix("ABCDEFG")
 
     # r = [from_dense([1, 0, 1]), from_dense([0, 1, 1]),
     # from_dense([1, 0, 0]), from_dense([0, 0, 1]),
@@ -149,4 +149,8 @@ if __name__ == "__main__":
 
     # print(d)
 
-    Algorithm_X(d, print)()
+    AlgorithmX(d, print)()
+
+
+if __name__ == '__main__':
+    main()
