@@ -1,3 +1,5 @@
+import string
+
 __author__ = 'Davide Canton'
 
 # /*
@@ -35,10 +37,10 @@ __author__ = 'Davide Canton'
 # (http://arxiv.org/abs/cs/0011047).
 #
 
-from dl_matrix import DL_Matrix
+from dl_matrix import DancingLinksMatrix, iterate_cell
 
 
-class Algorithm_X:
+class AlgorithmX:
     """
     Callable object implementing the Algorithm X.
     """
@@ -70,6 +72,11 @@ class Algorithm_X:
         self._search(0)
 
     def _search(self, k):
+        # print(f"Size: {k}")
+        # print(f"Solution: {self.sol_dict}")
+        # print("Matrix:")
+        # print(self.matrix)
+
         if self.matrix.header.R == self.matrix.header:
             # matrix is empty, solution found
             if self.callback(self._create_sol(k)):
@@ -85,14 +92,12 @@ class Algorithm_X:
         self.matrix.cover(col)
         row = col.D
 
-        while row is not col:
+        for row in iterate_cell(col, 'D'):
             self.sol_dict[k] = row
-            j = row.R
 
             # cover the columns pointed by the 1s in the chosen row
-            while j is not row:
+            for j in iterate_cell(row, 'R'):
                 self.matrix.cover(j.C)
-                j = j.R
 
             self._search(k + 1)
             if self.stop:
@@ -101,11 +106,9 @@ class Algorithm_X:
             # uncover columns
             row = self.sol_dict[k]
             col = row.C
-            j = row.L
-            while j is not row:
+
+            for j in iterate_cell(row, 'L'):
                 self.matrix.uncover(j.C)
-                j = j.L
-            row = row.D
 
         self.matrix.uncover(col)
 
@@ -115,38 +118,36 @@ class Algorithm_X:
         for key, row in self.sol_dict.items():
             if key >= k:
                 continue
-            tmp_list = []
-            start = row
-            tmp_list.append(row.C.name)
-            row = row.R
-            while row is not start:
-                tmp_list.append(row.C.name)
-                row = row.R
+
+            tmp_list = [row.C.name]
+            tmp_list.extend(r.C.name for r in iterate_cell(row, 'R'))
             sol[row.indexes[0]] = tmp_list
+
         return sol
 
 
-if __name__ == "__main__":
+def main():
     def from_dense(row):
         return [i for i, el in enumerate(row) if el]
 
-    r = [from_dense([0, 0, 1, 0, 1, 1, 0]),
-         from_dense([1, 0, 0, 1, 0, 0, 1]),
-         from_dense([0, 1, 1, 0, 0, 1, 0]),
-         from_dense([1, 0, 0, 1, 0, 0, 0]),
-         from_dense([0, 1, 0, 0, 0, 0, 1]),
-         from_dense([0, 0, 0, 1, 1, 0, 1])]
+    rows = [from_dense([0, 0, 1, 0, 1, 1, 0]),
+            from_dense([1, 0, 0, 1, 0, 0, 1]),
+            from_dense([0, 1, 1, 0, 0, 1, 0]),
+            from_dense([1, 0, 0, 1, 0, 0, 0]),
+            from_dense([0, 1, 0, 0, 0, 0, 1]),
+            from_dense([0, 0, 0, 1, 1, 0, 1])]
 
-    d = DL_Matrix("ABCDEFG")
+    size = max(max(rows, key=max)) + 1
 
-    # r = [from_dense([1, 0, 1]), from_dense([0, 1, 1]),
-    # from_dense([1, 0, 0]), from_dense([0, 0, 1]),
-    # from_dense([1, 1, 1])]
-    # d = DL_Matrix("ABC")
+    d = DancingLinksMatrix(string.ascii_uppercase[:size])
 
-    for row in r:
+    for row in rows:
         d.add_sparse_row(row, already_sorted=True)
 
     # print(d)
 
-    Algorithm_X(d, print)()
+    AlgorithmX(d, print)()
+
+
+if __name__ == "__main__":
+    main()

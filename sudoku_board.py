@@ -120,5 +120,5 @@ class Sudoku_Board:
                     row.append(str(el))
                 else:
                     row.append(" ")
-            rows.append("".join(row))
+            rows.append("|".join(row))
         return "\n".join(rows)
