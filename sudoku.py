@@ -72,18 +72,32 @@ class CountSolutions:
         self.count += 1
 
 
+def read_from_file(file_path):
+    known = {}
+    for i, line in enumerate(open(file_path), start=1):
+        for j, char in enumerate(line.rstrip(), start=1):
+            try:
+                known[i, j] = int(char)
+            except ValueError:
+                pass
+    return known
+
+
+def to_np(known):
+    matrix = np.zeros((9, 9), dtype=np.uint8)
+
+    for ((i, j), v) in known.items():
+        matrix[i - 1, j - 1] = v
+
+    return matrix
+
+
 def main():
     matrix = DancingLinksMatrix(column_names())
 
-    # init with known cells, maybe could be loaded from a file!
-    # known = {(1, 1): 4, (1, 2): 5, (1, 3): 6, (1, 4): 1,
-    #         (1, 5): 2, (1, 6): 8, (1, 7): 9, (1, 8): 3,
-    #         (1, 9): 7, (2, 1): 1, (3, 1): 8, (4, 1): 5,
-    #         (5, 1): 2, (6, 1): 3, (7, 1): 6, (8, 1): 9,
-    #         (9, 1): 7}
-    values = list(range(1, 10))
-    random.shuffle(values)
-    known = {(1, i): v for (i, v) in enumerate(values, start=1)}
+    known = read_from_file("./initial_board.txt")
+    # starting_board = Sudoku_Board(to_np(known))
+    # print(starting_board)
 
     for i, j in it.product(range(1, 10), repeat=2):
         if (i, j) in known:
@@ -96,13 +110,21 @@ def main():
 
     matrix.end_add()
 
+    # sol = CountSolutions()
     sol = GetFirstSol()
-    alg = AlgorithmX(matrix, sol)
-    alg()
 
-    board = Sudoku_Board(sol.sol)
-    print(board)
-    print(board.valid())
+    try:
+        alg = AlgorithmX(matrix, sol)
+        alg()
+
+        board = Sudoku_Board(sol.sol)
+        print(board)
+        print(board.valid())
+    except KeyboardInterrupt:
+        pass
+    finally:
+        # print(sol.count)
+        pass
 
 
 if __name__ == '__main__':
