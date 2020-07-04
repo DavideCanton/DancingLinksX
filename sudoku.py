@@ -74,12 +74,13 @@ class CountSolutions:
 
 def read_from_file(file_path):
     known = {}
-    for i, line in enumerate(open(file_path), start=1):
-        for j, char in enumerate(line.rstrip(), start=1):
-            try:
-                known[i, j] = int(char)
-            except ValueError:
-                pass
+    with open(file_path) as f_in:
+        for i, line in enumerate(f_in, start=1):
+            for j, char in enumerate(line.rstrip(), start=1):
+                try:
+                    known[i, j] = int(char)
+                except ValueError:
+                    pass
     return known
 
 
