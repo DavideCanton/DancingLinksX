@@ -3,7 +3,11 @@ Implementation of Donald Knuth's Dancing Links Sparse Matrix
 as a circular doubly linked list. (http://arxiv.org/abs/cs/0011047)
 """
 
+from __future__ import annotations
+
 import random
+from typing import Generator, Iterable, Literal
+from typing_extensions import Self
 
 import numpy as np
 
@@ -24,17 +28,24 @@ class Cell:
     and the indexes associated.
     """
 
+    U: Self
+    D: Self
+    L: Self
+    R: Self
+    C: HeaderCell
+    indexes: tuple[int, int] | None
+
     __slots__ = list("UDLRC") + ["indexes"]
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.U = self.D = self.L = self.R = self
         self.C = None
         self.indexes = None
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"Node: {self.indexes}"
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"Cell[{self.indexes}]"
 
 
@@ -44,9 +55,13 @@ class HeaderCell(Cell):
     member.
     """
 
+    size: int
+    name: str
+    is_first: bool
+
     __slots__ = ["size", "name", "is_first"]
 
-    def __init__(self, name):
+    def __init__(self, name: str) -> str:
         super().__init__()
         self.size = 0
         self.name = name
@@ -61,7 +76,12 @@ class DancingLinksMatrix:
     neighbors in a circular fashion.
     """
 
-    def __init__(self, columns):
+    header: HeaderCell
+    rows: int
+    cols: int
+    col_list: list[HeaderCell] | None
+
+    def __init__(self, columns: int | Iterable[str]):
         """
         Creates a DL_Matrix.
 
@@ -82,7 +102,7 @@ class DancingLinksMatrix:
         self.col_list = []
         self._create_column_headers(columns)
 
-    def _create_column_headers(self, columns):
+    def _create_column_headers(self, columns: int | Iterable[str]):
         if isinstance(columns, int):
             columns = int(columns)
             column_names = (f"C{i}" for i in range(columns))
@@ -112,7 +132,7 @@ class DancingLinksMatrix:
         prev.R = self.header
         self.header.L = prev
 
-    def add_sparse_row(self, row, already_sorted=False):
+    def add_sparse_row(self, row: list[int], already_sorted=False):
         """
         Adds a sparse row to the matrix. The row is in format
         [ind_0, ..., ind_n] where 0 <= ind_i < dl_matrix.ncols.
@@ -160,14 +180,14 @@ class DancingLinksMatrix:
         cell.R = start
         self.rows += 1
 
-    def end_add(self):
+    def end_add(self) -> None:
         """
         Called when there are no more rows to be inserted. Not strictly
         necessary, but it can save some memory.
         """
         self.col_list = None
 
-    def min_column(self):
+    def min_column(self) -> HeaderCell:
         """
         Returns the column header of the column with the minimum number of 1s.
         :return: A column header.
@@ -179,13 +199,14 @@ class DancingLinksMatrix:
 
         col_min = self.header.R
 
+        col: HeaderCell
         for col in iterate_cell(self.header, "R"):
             if not col.is_first and col.size < col_min.size:
                 col_min = col
 
         return col_min
 
-    def random_column(self):
+    def random_column(self) -> HeaderCell:
         """
         Returns a random column header. (The matrix header is never returned)
         :return: A column header.
@@ -209,9 +230,9 @@ class DancingLinksMatrix:
         m = np.zeros((self.rows, self.cols), dtype=np.uint8)
         rows, cols = set(), []
 
+        col: HeaderCell
         for col in iterate_cell(self.header, "R"):
             cols.append(col.indexes[1])
-            # noinspection PyUnresolvedReferences
             names.append(col.name)
 
             for cell in iterate_cell(col, "D"):
@@ -223,7 +244,7 @@ class DancingLinksMatrix:
         return "\n".join([", ".join(names), str(m)])
 
     @staticmethod
-    def cover(c):
+    def cover(c: HeaderCell) -> None:
         """
         Covers the column c by removing the 1s in the column and also all
         the rows connected to them.
@@ -231,7 +252,6 @@ class DancingLinksMatrix:
         :param c: The column header of the column that has to be covered.
 
         """
-        # print("Cover column", c.name)
         c.R.L = c.L
         c.L.R = c.R
 
@@ -242,14 +262,13 @@ class DancingLinksMatrix:
                 j.C.size -= 1
 
     @staticmethod
-    def uncover(c):
+    def uncover(c: HeaderCell) -> None:
         """
-        Uncovers the column c by readding the 1s in the column and also all
+        Uncovers the column c by re-adding the 1s in the column and also all
         the rows connected to them.
 
         :param c: The column header of the column that has to be uncovered.
         """
-        # print("Uncover column", c.name)
         for i in iterate_cell(c, "U"):
             for j in iterate_cell(i, "L"):
                 j.C.size += 1
@@ -258,8 +277,8 @@ class DancingLinksMatrix:
         c.R.L = c.L.R = c
 
 
-def iterate_cell(cell, direction):
-    cur = getattr(cell, direction)
+def iterate_cell(cell: Cell, direction: Literal["U", "D", "L", "R"]) -> Generator[Cell, None, None]:
+    cur: Cell = getattr(cell, direction)
     while cur is not cell:
         yield cur
         cur = getattr(cur, direction)

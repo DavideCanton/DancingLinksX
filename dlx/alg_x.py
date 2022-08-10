@@ -3,22 +3,35 @@ Implementation of Donald Knuth's Algorithm X
 (http://arxiv.org/abs/cs/0011047).
 """
 
+from collections import abc
 import string
+from typing import Callable
 
-from .dlmatrix import DancingLinksMatrix, iterate_cell
+from .dlmatrix import Cell, DancingLinksMatrix, iterate_cell
 
 __author__ = "Davide Canton"
 
 
-class AlgorithmX:
+class AlgorithmX(abc.Callable):
     """Callable object implementing the Algorithm X."""
 
-    def __init__(self, matrix, callback, choose_min=True):
+    sol_dict: dict[int, Cell]
+    stop: bool
+    matrix: DancingLinksMatrix
+    callback: Callable[[dict[int, list[str]]], bool]
+    choose_min: bool
+
+    def __init__(
+        self,
+        matrix: DancingLinksMatrix,
+        callback: Callable[[dict[int, list[str]]], bool],
+        choose_min=True,
+    ):
         """
         Creates an Algorithm_X object that solves the problem
         encoded in matrix.
 
-        :param matrix: The DL_Matrix instance.
+        :param matrix: The DancingLinksMatrix instance.
         :param callback: The callback called on every solution. callback has to
                          be a function receiving a dict argument
                          {row_index: linked list of the row}, and can return a
@@ -39,7 +52,7 @@ class AlgorithmX:
         """Starts the search."""
         self._search(0)
 
-    def _search(self, k):
+    def _search(self, k: int):
         # print(f"Size: {k}")
         # print(f"Solution: {self.sol_dict}")
         # print("Matrix:")
@@ -80,7 +93,7 @@ class AlgorithmX:
 
         self.matrix.uncover(col)
 
-    def _create_sol(self, k):
+    def _create_sol(self, k: int) -> dict[int, list[str]]:
         # creates a solution from the inner dict
         sol = {}
         for key, row in self.sol_dict.items():
