@@ -5,7 +5,7 @@ Sudoku Board implementation.
 import numpy as np
 from numpy.lib.stride_tricks import as_strided
 
-__author__ = 'Davide Canton'
+__author__ = "Davide Canton"
 
 
 class Sudoku_Board:
@@ -18,9 +18,7 @@ class Sudoku_Board:
             self._board = np.array(m, dtype=np.uint8)
         else:
             self._board = np.zeros((9, 9), dtype=np.uint8)
-        self.squares = as_strided(self._board,
-                                  shape=(3, 3, 3, 3),
-                                  strides=(27, 3, 9, 1))
+        self.squares = as_strided(self._board, shape=(3, 3, 3, 3), strides=(27, 3, 9, 1))
 
     def all_filled(self):
         """

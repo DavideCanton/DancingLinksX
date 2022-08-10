@@ -2,10 +2,9 @@
 N-queens solver using Dancing Links.
 """
 
-from dlmatrix import DancingLinksMatrix
-from alg_x import AlgorithmX
+from dlx import AlgorithmX, DancingLinksMatrix
 
-__author__ = 'Davide Canton'
+__author__ = "Davide Canton"
 
 
 def get_names(n):

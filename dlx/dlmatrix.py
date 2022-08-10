@@ -4,6 +4,7 @@ as a circular doubly linked list. (http://arxiv.org/abs/cs/0011047)
 """
 
 import random
+
 import numpy as np
 
 __author__ = "Davide Canton"
@@ -22,6 +23,7 @@ class Cell:
     Inner cell, storing 4 pointers to neighbors, a pointer to the column header
     and the indexes associated.
     """
+
     __slots__ = list("UDLRC") + ["indexes"]
 
     def __init__(self):
@@ -41,10 +43,11 @@ class HeaderCell(Cell):
     Column Header cell, a special cell that stores also a name and a size
     member.
     """
+
     __slots__ = ["size", "name", "is_first"]
 
     def __init__(self, name):
-        super(HeaderCell, self).__init__()
+        super().__init__()
         self.size = 0
         self.name = name
         self.is_first = False
@@ -176,7 +179,7 @@ class DancingLinksMatrix:
 
         col_min = self.header.R
 
-        for col in iterate_cell(self.header, 'R'):
+        for col in iterate_cell(self.header, "R"):
             if not col.is_first and col.size < col_min.size:
                 col_min = col
 
@@ -206,12 +209,12 @@ class DancingLinksMatrix:
         m = np.zeros((self.rows, self.cols), dtype=np.uint8)
         rows, cols = set(), []
 
-        for col in iterate_cell(self.header, 'R'):
+        for col in iterate_cell(self.header, "R"):
             cols.append(col.indexes[1])
             # noinspection PyUnresolvedReferences
             names.append(col.name)
 
-            for cell in iterate_cell(col, 'D'):
+            for cell in iterate_cell(col, "D"):
                 ind = cell.indexes
                 rows.add(ind[0])
                 m[ind] = 1
@@ -232,8 +235,8 @@ class DancingLinksMatrix:
         c.R.L = c.L
         c.L.R = c.R
 
-        for i in iterate_cell(c, 'D'):
-            for j in iterate_cell(i, 'R'):
+        for i in iterate_cell(c, "D"):
+            for j in iterate_cell(i, "R"):
                 j.D.U = j.U
                 j.U.D = j.D
                 j.C.size -= 1
@@ -247,8 +250,8 @@ class DancingLinksMatrix:
         :param c: The column header of the column that has to be uncovered.
         """
         # print("Uncover column", c.name)
-        for i in iterate_cell(c, 'U'):
-            for j in iterate_cell(i, 'L'):
+        for i in iterate_cell(c, "U"):
+            for j in iterate_cell(i, "L"):
                 j.C.size += 1
                 j.D.U = j.U.D = j
 
@@ -267,13 +270,13 @@ class MatrixDisplayer:
     def __init__(self, matrix):
         dic = {}
 
-        for col in iterate_cell(matrix.header, 'R'):
+        for col in iterate_cell(matrix.header, "R"):
             dic[col.indexes] = col
 
-        for col in iterate_cell(matrix.header, 'R'):
+        for col in iterate_cell(matrix.header, "R"):
             first = col.D
             dic[first.indexes] = first
-            for cell in iterate_cell(first, 'D'):
+            for cell in iterate_cell(first, "D"):
                 if cell is not col:
                     dic[cell.indexes] = cell
 
@@ -300,15 +303,18 @@ class MatrixDisplayer:
 
 
 if __name__ == "__main__":
+
     def from_dense(row):
         return [i for i, el in enumerate(row) if el]
 
-    r = [from_dense([1, 0, 0, 1, 0, 0, 1]),
-         from_dense([1, 0, 0, 1, 0, 0, 0]),
-         from_dense([0, 0, 0, 1, 1, 0, 1]),
-         from_dense([0, 0, 1, 0, 1, 1, 0]),
-         from_dense([0, 1, 1, 0, 0, 1, 1]),
-         from_dense([0, 1, 0, 0, 0, 0, 1])]
+    r = [
+        from_dense([1, 0, 0, 1, 0, 0, 1]),
+        from_dense([1, 0, 0, 1, 0, 0, 0]),
+        from_dense([0, 0, 0, 1, 1, 0, 1]),
+        from_dense([0, 0, 1, 0, 1, 1, 0]),
+        from_dense([0, 1, 1, 0, 0, 1, 1]),
+        from_dense([0, 1, 0, 0, 0, 0, 1]),
+    ]
 
     d = DancingLinksMatrix("1234567")
 

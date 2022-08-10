@@ -3,10 +3,11 @@ Implementation of Donald Knuth's Algorithm X
 (http://arxiv.org/abs/cs/0011047).
 """
 
-from dlmatrix import DancingLinksMatrix, iterate_cell
 import string
 
-__author__ = 'Davide Canton'
+from .dlmatrix import DancingLinksMatrix, iterate_cell
+
+__author__ = "Davide Canton"
 
 
 class AlgorithmX:
@@ -59,11 +60,11 @@ class AlgorithmX:
         self.matrix.cover(col)
         row = col.D
 
-        for row in iterate_cell(col, 'D'):
+        for row in iterate_cell(col, "D"):
             self.sol_dict[k] = row
 
             # cover the columns pointed by the 1s in the chosen row
-            for j in iterate_cell(row, 'R'):
+            for j in iterate_cell(row, "R"):
                 self.matrix.cover(j.C)
 
             self._search(k + 1)
@@ -74,7 +75,7 @@ class AlgorithmX:
             row = self.sol_dict[k]
             col = row.C
 
-            for j in iterate_cell(row, 'L'):
+            for j in iterate_cell(row, "L"):
                 self.matrix.uncover(j.C)
 
         self.matrix.uncover(col)
@@ -87,7 +88,7 @@ class AlgorithmX:
                 continue
 
             tmp_list = [row.C.name]
-            tmp_list.extend(r.C.name for r in iterate_cell(row, 'R'))
+            tmp_list.extend(r.C.name for r in iterate_cell(row, "R"))
             sol[row.indexes[0]] = tmp_list
 
         return sol
@@ -97,12 +98,14 @@ def main():
     def from_dense(row):
         return [i for i, el in enumerate(row) if el]
 
-    rows = [from_dense([0, 0, 1, 0, 1, 1, 0]),
-            from_dense([1, 0, 0, 1, 0, 0, 1]),
-            from_dense([0, 1, 1, 0, 0, 1, 0]),
-            from_dense([1, 0, 0, 1, 0, 0, 0]),
-            from_dense([0, 1, 0, 0, 0, 0, 1]),
-            from_dense([0, 0, 0, 1, 1, 0, 1])]
+    rows = [
+        from_dense([0, 0, 1, 0, 1, 1, 0]),
+        from_dense([1, 0, 0, 1, 0, 0, 1]),
+        from_dense([0, 1, 1, 0, 0, 1, 0]),
+        from_dense([1, 0, 0, 1, 0, 0, 0]),
+        from_dense([0, 1, 0, 0, 0, 0, 1]),
+        from_dense([0, 0, 0, 1, 1, 0, 1]),
+    ]
 
     size = max(max(rows, key=max)) + 1
 

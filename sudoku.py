@@ -2,15 +2,14 @@
 Sudoku Solver using Dancing Links.
 """
 
-import random
 import itertools as it
+
 import numpy as np
 
-from dlmatrix import DancingLinksMatrix
-from alg_x import AlgorithmX
+from dlx import AlgorithmX, DancingLinksMatrix
 from sudoku_board import Sudoku_Board
 
-__author__ = 'Davide Canton'
+__author__ = "Davide Canton"
 
 
 def column_names():
@@ -128,5 +127,5 @@ def main():
         pass
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
