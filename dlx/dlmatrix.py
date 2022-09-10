@@ -28,11 +28,11 @@ class Cell:
     and the indexes associated.
     """
 
-    U: Self
-    D: Self
-    L: Self
-    R: Self
-    C: HeaderCell
+    U: Cell | None
+    D: Cell | None
+    L: Self | None
+    R: Self | None
+    C: HeaderCell | None
     indexes: tuple[int, int] | None
 
     __slots__ = list("UDLRC") + ["indexes"]
@@ -102,15 +102,12 @@ class DancingLinksMatrix:
         self.col_list = []
         self._create_column_headers(columns)
 
-    def _create_column_headers(self, columns: int | Iterable[str]):
+    def _create_column_headers(self, columns: int | Iterable[str | tuple[str, bool]]):
         if isinstance(columns, int):
             columns = int(columns)
             column_names = (f"C{i}" for i in range(columns))
         else:
-            try:
-                column_names = iter(columns)
-            except TypeError:
-                raise TypeError("Argument is not valid")
+            column_names = columns
 
         prev = self.header
         # links every column in a for loop
@@ -193,7 +190,6 @@ class DancingLinksMatrix:
         :return: A column header.
         :raises: EmptyDLMatrix if the matrix is empty.
         """
-        # noinspection PyUnresolvedReferences
         if self.header.R.is_first:
             raise EmptyDLMatrix()
 
@@ -277,7 +273,7 @@ class DancingLinksMatrix:
         c.R.L = c.L.R = c
 
 
-def iterate_cell(cell: Cell, direction: Literal["U", "D", "L", "R"]) -> Generator[Cell, None, None]:
+def iterate_cell(cell: Cell, direction: Literal["U", "D", "L", "R"]) -> Iterable[Cell]:
     cur: Cell = getattr(cell, direction)
     while cur is not cell:
         yield cur
