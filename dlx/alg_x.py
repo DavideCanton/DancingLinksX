@@ -3,9 +3,9 @@ Implementation of Donald Knuth's Algorithm X
 (http://arxiv.org/abs/cs/0011047).
 """
 
-from collections import abc
 import string
-from typing import Callable
+from collections import abc
+from collections.abc import Callable
 
 from .dlmatrix import Cell, DancingLinksMatrix, iterate_cell
 

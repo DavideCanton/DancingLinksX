@@ -6,8 +6,8 @@ as a circular doubly linked list. (http://arxiv.org/abs/cs/0011047)
 from __future__ import annotations
 
 import random
-from typing import Generator, Iterable, Literal
-from typing_extensions import Self
+from collections.abc import Iterable
+from typing import Literal, Self
 
 import numpy as np
 
