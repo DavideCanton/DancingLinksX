@@ -7,7 +7,8 @@ import itertools as it
 import numpy as np
 
 from dlx import AlgorithmX, DancingLinksMatrix
-from sudoku_board import Sudoku_Board
+
+from .sudoku_board import Sudoku_Board
 
 __author__ = "Davide Canton"
 
