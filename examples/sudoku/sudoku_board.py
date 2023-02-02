@@ -1,6 +1,4 @@
-"""
-Sudoku Board implementation.
-"""
+"""Sudoku Board implementation."""
 
 import numpy as np
 from numpy.lib.stride_tricks import as_strided
@@ -10,8 +8,7 @@ __author__ = "Davide Canton"
 
 class Sudoku_Board:
     def __init__(self, m=None):
-        """
-        Creates a board. If m is not None, it is copied.
+        """Creates a board. If m is not None, it is copied.
         :param m: a ndarray or a list of lists.
         """
         if m is not None:
@@ -21,22 +18,18 @@ class Sudoku_Board:
         self.squares = as_strided(self._board, shape=(3, 3, 3, 3), strides=(27, 3, 9, 1))
 
     def all_filled(self):
-        """
-        Returns True if there are no empty cells.
+        """Returns True if there are no empty cells.
         :return: True if all the cells are filled.
         """
         return np.count_nonzero(self._board) == 81
 
     @property
     def board(self):
-        """
-        Returns the underlying board object.
-        """
+        """Returns the underlying board object."""
         return self._board
 
     def __getitem__(self, key):
-        """
-        Returns the item at position key.
+        """Returns the item at position key.
         :param key: A tuple of 0-based indices.
         :return: An integer between 1 and 9, or 0 if the cell is empty.
         :raises ValueError if the position is invalid.
@@ -47,8 +40,7 @@ class Sudoku_Board:
             raise ValueError("Invalid position")
 
     def __setitem__(self, key, value):
-        """
-        Sets the item at position key.
+        """Sets the item at position key.
         :param key: A tuple of 0-based indices.
         :param value: An integer between 1 and 9, or 0 if the cell has to be
         emptied.
@@ -63,8 +55,7 @@ class Sudoku_Board:
         return all(0 <= i <= 8 for i in pos)
 
     def valid(self):
-        """
-        Returns True if the board is a valid Sudoku.
+        """Returns True if the board is a valid Sudoku.
         :return: True if the board is a valid Sudoku, False else.
         """
         for i in range(9):

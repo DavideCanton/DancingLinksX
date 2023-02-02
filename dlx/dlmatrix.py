@@ -1,6 +1,5 @@
-"""
-Implementation of Donald Knuth's Dancing Links Sparse Matrix
-as a circular doubly linked list. (http://arxiv.org/abs/cs/0011047)
+"""Implementation of Donald Knuth's Dancing Links Sparse Matrix
+as a circular doubly linked list. (http://arxiv.org/abs/cs/0011047).
 """
 
 from __future__ import annotations
@@ -23,8 +22,7 @@ class EmptyDLMatrix(Exception):
 
 
 class Cell:
-    """
-    Inner cell, storing 4 pointers to neighbors, a pointer to the column header
+    """Inner cell, storing 4 pointers to neighbors, a pointer to the column header
     and the indexes associated.
     """
 
@@ -50,8 +48,7 @@ class Cell:
 
 
 class HeaderCell(Cell):
-    """
-    Column Header cell, a special cell that stores also a name and a size
+    """Column Header cell, a special cell that stores also a name and a size
     member.
     """
 
@@ -69,8 +66,7 @@ class HeaderCell(Cell):
 
 
 class DancingLinksMatrix:
-    """
-    Dancing Links sparse matrix implementation.
+    """Dancing Links sparse matrix implementation.
     It stores a circular doubly linked list of 1s, and another list
     of column headers. Every cell points to its upper, lower, left and right
     neighbors in a circular fashion.
@@ -82,8 +78,7 @@ class DancingLinksMatrix:
     col_list: list[HeaderCell] | None
 
     def __init__(self, columns: int | Iterable[str]):
-        """
-        Creates a DL_Matrix.
+        """Creates a DL_Matrix.
 
         :param columns: it can be an integer or an iterable. If columns is an
                         integer, columns columns are added to the matrix,
@@ -130,8 +125,7 @@ class DancingLinksMatrix:
         self.header.L = prev
 
     def add_sparse_row(self, row: list[int], already_sorted=False):
-        """
-        Adds a sparse row to the matrix. The row is in format
+        """Adds a sparse row to the matrix. The row is in format
         [ind_0, ..., ind_n] where 0 <= ind_i < dl_matrix.ncols.
         If called after end_add is executed, CannotAddRowsError is raised.
 
@@ -178,15 +172,13 @@ class DancingLinksMatrix:
         self.rows += 1
 
     def end_add(self) -> None:
-        """
-        Called when there are no more rows to be inserted. Not strictly
+        """Called when there are no more rows to be inserted. Not strictly
         necessary, but it can save some memory.
         """
         self.col_list = None
 
     def min_column(self) -> HeaderCell:
-        """
-        Returns the column header of the column with the minimum number of 1s.
+        """Returns the column header of the column with the minimum number of 1s.
         :return: A column header.
         :raises: EmptyDLMatrix if the matrix is empty.
         """
@@ -203,8 +195,7 @@ class DancingLinksMatrix:
         return col_min
 
     def random_column(self) -> HeaderCell:
-        """
-        Returns a random column header. (The matrix header is never returned)
+        """Returns a random column header. (The matrix header is never returned)
         :return: A column header.
         :raises: EmptyDLMatrix if the matrix is empty.
         """
@@ -241,8 +232,7 @@ class DancingLinksMatrix:
 
     @staticmethod
     def cover(c: HeaderCell) -> None:
-        """
-        Covers the column c by removing the 1s in the column and also all
+        """Covers the column c by removing the 1s in the column and also all
         the rows connected to them.
 
         :param c: The column header of the column that has to be covered.
@@ -259,8 +249,7 @@ class DancingLinksMatrix:
 
     @staticmethod
     def uncover(c: HeaderCell) -> None:
-        """
-        Uncovers the column c by re-adding the 1s in the column and also all
+        """Uncovers the column c by re-adding the 1s in the column and also all
         the rows connected to them.
 
         :param c: The column header of the column that has to be uncovered.

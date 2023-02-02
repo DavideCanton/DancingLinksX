@@ -1,6 +1,4 @@
-"""
-N-queens solver using Dancing Links.
-"""
+"""N-queens solver using Dancing Links."""
 
 from dlx import AlgorithmX, DancingLinksMatrix
 

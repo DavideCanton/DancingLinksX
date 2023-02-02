@@ -1,6 +1,4 @@
-"""
-Sudoku Solver using Dancing Links.
-"""
+"""Sudoku Solver using Dancing Links."""
 
 import itertools as it
 

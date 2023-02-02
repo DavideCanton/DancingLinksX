@@ -1,5 +1,4 @@
-"""
-Implementation of Donald Knuth's Algorithm X
+"""Implementation of Donald Knuth's Algorithm X
 (http://arxiv.org/abs/cs/0011047).
 """
 
@@ -27,8 +26,7 @@ class AlgorithmX(abc.Callable):
         callback: Callable[[dict[int, list[str]]], bool],
         choose_min=True,
     ):
-        """
-        Creates an Algorithm_X object that solves the problem
+        """Creates an Algorithm_X object that solves the problem
         encoded in matrix.
 
         :param matrix: The DancingLinksMatrix instance.
