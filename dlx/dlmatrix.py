@@ -1,5 +1,7 @@
-"""Implementation of Donald Knuth's Dancing Links Sparse Matrix
-as a circular doubly linked list. (http://arxiv.org/abs/cs/0011047).
+"""Implementation of Donald Knuth's Dancing Links Sparse Matrix.
+
+It uses a circular doubly linked list. 
+See http://arxiv.org/abs/cs/0011047.
 """
 
 from __future__ import annotations
@@ -14,16 +16,17 @@ __author__ = "Davide Canton"
 
 
 class CannotAddRowsError(Exception):
-    pass
+    """Exception raised if no rows can be added to the matrix."""
 
 
 class EmptyDLMatrix(Exception):
-    pass
+    """Exception raised if the matrix is empty."""
 
 
 class Cell:
-    """Inner cell, storing 4 pointers to neighbors, a pointer to the column header
-    and the indexes associated.
+    """Inner cell.
+
+    It stores 4 pointers to neighbors, a pointer to the column header and the indexes associated.
     """
 
     U: Cell | None
@@ -48,8 +51,9 @@ class Cell:
 
 
 class HeaderCell(Cell):
-    """Column Header cell, a special cell that stores also a name and a size
-    member.
+    """Column Header cell.
+
+    This is a special cell that stores also a ``name`` and a ``size`` member.
     """
 
     size: int
@@ -67,6 +71,7 @@ class HeaderCell(Cell):
 
 class DancingLinksMatrix:
     """Dancing Links sparse matrix implementation.
+
     It stores a circular doubly linked list of 1s, and another list
     of column headers. Every cell points to its upper, lower, left and right
     neighbors in a circular fashion.
@@ -125,9 +130,11 @@ class DancingLinksMatrix:
         self.header.L = prev
 
     def add_sparse_row(self, row: list[int], already_sorted=False):
-        """Adds a sparse row to the matrix. The row is in format
-        [ind_0, ..., ind_n] where 0 <= ind_i < dl_matrix.ncols.
-        If called after end_add is executed, CannotAddRowsError is raised.
+        """Adds a sparse row to the matrix.
+
+        The row is in format
+        ``[ind_0, ..., ind_n]`` where ``0 <= ind_i < dl_matrix.ncols``.
+        If called after end_add is executed, ``CannotAddRowsError`` is raised.
 
         :param row: a sequence of integers indicating the 1s in the row.
         :param already_sorted: True if the row is already sorted,
@@ -172,13 +179,15 @@ class DancingLinksMatrix:
         self.rows += 1
 
     def end_add(self) -> None:
-        """Called when there are no more rows to be inserted. Not strictly
-        necessary, but it can save some memory.
+        """Called when there are no more rows to be inserted.
+
+        Not strictly necessary, but it can save some memory.
         """
         self.col_list = None
 
     def min_column(self) -> HeaderCell:
         """Returns the column header of the column with the minimum number of 1s.
+
         :return: A column header.
         :raises: EmptyDLMatrix if the matrix is empty.
         """
@@ -195,7 +204,10 @@ class DancingLinksMatrix:
         return col_min
 
     def random_column(self) -> HeaderCell:
-        """Returns a random column header. (The matrix header is never returned)
+        """Returns a random column header.
+
+        The matrix header is never returned.
+
         :return: A column header.
         :raises: EmptyDLMatrix if the matrix is empty.
         """
@@ -231,17 +243,18 @@ class DancingLinksMatrix:
         return "\n".join([", ".join(names), str(m)])
 
     @staticmethod
-    def cover(c: HeaderCell) -> None:
-        """Covers the column c by removing the 1s in the column and also all
+    def cover(col: HeaderCell) -> None:
+        """Covers the column ``col``.
+
+        It is done by removing the 1s in the column and also all
         the rows connected to them.
 
-        :param c: The column header of the column that has to be covered.
-
+        :param col: The column header of the column that has to be covered.
         """
-        c.R.L = c.L
-        c.L.R = c.R
+        col.R.L = col.L
+        col.L.R = col.R
 
-        for i in iterate_cell(c, "D"):
+        for i in iterate_cell(col, "D"):
             for j in iterate_cell(i, "R"):
                 j.D.U = j.U
                 j.U.D = j.D
@@ -249,7 +262,9 @@ class DancingLinksMatrix:
 
     @staticmethod
     def uncover(c: HeaderCell) -> None:
-        """Uncovers the column c by re-adding the 1s in the column and also all
+        """Uncovers the column c.
+
+        It is done by re-adding the 1s in the column and also all
         the rows connected to them.
 
         :param c: The column header of the column that has to be uncovered.
@@ -306,18 +321,18 @@ class MatrixDisplayer:
             print()
 
 
+def _from_dense(row):
+    return [i for i, el in enumerate(row) if el]
+
+
 if __name__ == "__main__":
-
-    def from_dense(row):
-        return [i for i, el in enumerate(row) if el]
-
     r = [
-        from_dense([1, 0, 0, 1, 0, 0, 1]),
-        from_dense([1, 0, 0, 1, 0, 0, 0]),
-        from_dense([0, 0, 0, 1, 1, 0, 1]),
-        from_dense([0, 0, 1, 0, 1, 1, 0]),
-        from_dense([0, 1, 1, 0, 0, 1, 1]),
-        from_dense([0, 1, 0, 0, 0, 0, 1]),
+        _from_dense([1, 0, 0, 1, 0, 0, 1]),
+        _from_dense([1, 0, 0, 1, 0, 0, 0]),
+        _from_dense([0, 0, 0, 1, 1, 0, 1]),
+        _from_dense([0, 0, 1, 0, 1, 1, 0]),
+        _from_dense([0, 1, 1, 0, 0, 1, 1]),
+        _from_dense([0, 1, 0, 0, 0, 0, 1]),
     ]
 
     d = DancingLinksMatrix("1234567")

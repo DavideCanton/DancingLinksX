@@ -6,6 +6,7 @@ __author__ = "Davide Canton"
 
 
 def get_names(n):
+    """Yields the column names."""
     for i in range(n):
         yield f"R{i}"
     for i in range(n):
@@ -17,6 +18,7 @@ def get_names(n):
 
 
 def compute_row(i, j, n):
+    """Computes the row indexes."""
     # R is 0 .. N-1
     # F is N .. 2*N-1
     # A is 2*N .. 4*N - 2
@@ -25,10 +27,14 @@ def compute_row(i, j, n):
 
 
 class PrintFirstSol:
+    """Callable that prints the first solution."""
+
     def __init__(self, size):
+        """Init."""
         self.size = size
 
     def __call__(self, sol):
+        """Prints the solution."""
         pos = [0] * self.size
 
         for v in sol.values():
@@ -47,6 +53,7 @@ class PrintFirstSol:
 
 
 def print_solution_count():
+    """Prints the solution count."""
     count = 0
 
     def inner(*a):
@@ -57,6 +64,7 @@ def print_solution_count():
 
 
 def main():
+    """Main solver."""
     size = 6
 
     d = DancingLinksMatrix(get_names(size))

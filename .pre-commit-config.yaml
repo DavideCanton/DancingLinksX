@@ -3,22 +3,5 @@ repos:
     rev: 22.10.0
     hooks:
       - id: black
-        args: 
-        - "--check"
-  - repo: https://github.com/PyCQA/isort
-    rev: 5.10.1
-    hooks:
-      - id: isort
-        args: 
-        - "--check"
-  - repo: https://github.com/PyCQA/flake8
-    rev: 6.0.0
-    hooks:
-      - id: flake8
-        additional_dependencies: [flake8-pyproject]
-  - repo: https://github.com/asottile/pyupgrade
-    rev: v3.3.1
-    hooks:
-      - id: pyupgrade
         args:
-        - "--py311-plus"
+          - "--check"

@@ -44,14 +44,10 @@ pre-commit==2.19.0
     # via -r dev-requirements.in
 pyproject-hooks==1.0.0
     # via build
-pyupgrade==3.3.1
-    # via -r dev-requirements.in
 pyyaml==6.0
     # via pre-commit
-ruff==0.0.239
+ruff==0.0.252
     # via -r dev-requirements.in
-tokenize-rt==5.0.0
-    # via pyupgrade
 toml==0.10.2
     # via pre-commit
 virtualenv==20.17.1

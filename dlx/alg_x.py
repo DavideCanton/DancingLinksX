@@ -1,5 +1,6 @@
-"""Implementation of Donald Knuth's Algorithm X
-(http://arxiv.org/abs/cs/0011047).
+"""Implementation of Donald Knuth's Algorithm X.
+
+See http://arxiv.org/abs/cs/0011047.
 """
 
 import string
@@ -26,19 +27,18 @@ class AlgorithmX(abc.Callable):
         callback: Callable[[dict[int, list[str]]], bool],
         choose_min=True,
     ):
-        """Creates an Algorithm_X object that solves the problem
-        encoded in matrix.
+        """Creates an Algorithm_X object that solves the problem encoded in matrix.
 
-        :param matrix: The DancingLinksMatrix instance.
-        :param callback: The callback called on every solution. callback has to
-                         be a function receiving a dict argument
-                         {row_index: linked list of the row}, and can return a
-                         bool value. The solver keeps going on until the
-                         callback returns a True value.
+        Args:
+            matrix (DancingLinksMatrix): The ``DancingLinksMatrix`` instance.
 
-        :param choose_min: If True, the column with the minimum number of 1s is
-                           chosen at each iteration, if False a random column is
-                           chosen.
+            callback (Callable): The callback called on every solution. callback has to
+            be a function receiving a dict argument ``{row_index: linked list of the row}``,
+            and can return a ``bool`` value. The solver keeps going on until the callback returns
+            ``True``.
+
+            choose_min (bool): If ``True``, the column with the minimum number of 1s is
+            chosen at each iteration, if ``False`` a random column is chosen.
         """
         self.sol_dict = {}
         self.stop = False
@@ -105,17 +105,19 @@ class AlgorithmX(abc.Callable):
         return sol
 
 
-def main():
-    def from_dense(row):
-        return [i for i, el in enumerate(row) if el]
+def _from_dense(row):
+    return [i for i, el in enumerate(row) if el]
 
+
+def main():
+    """Main."""
     rows = [
-        from_dense([0, 0, 1, 0, 1, 1, 0]),
-        from_dense([1, 0, 0, 1, 0, 0, 1]),
-        from_dense([0, 1, 1, 0, 0, 1, 0]),
-        from_dense([1, 0, 0, 1, 0, 0, 0]),
-        from_dense([0, 1, 0, 0, 0, 0, 1]),
-        from_dense([0, 0, 0, 1, 1, 0, 1]),
+        _from_dense([0, 0, 1, 0, 1, 1, 0]),
+        _from_dense([1, 0, 0, 1, 0, 0, 1]),
+        _from_dense([0, 1, 1, 0, 0, 1, 0]),
+        _from_dense([1, 0, 0, 1, 0, 0, 0]),
+        _from_dense([0, 1, 0, 0, 0, 0, 1]),
+        _from_dense([0, 0, 0, 1, 1, 0, 1]),
     ]
 
     size = max(max(rows, key=max)) + 1
