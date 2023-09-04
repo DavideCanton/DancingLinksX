@@ -29,10 +29,10 @@ class Cell:
     It stores 4 pointers to neighbors, a pointer to the column header and the indexes associated.
     """
 
-    U: Cell | None
-    D: Cell | None
-    L: Self | None
-    R: Self | None
+    U: Self
+    D: Self
+    L: Self
+    R: Self
     C: HeaderCell | None
     indexes: tuple[int, int] | None
 
@@ -62,7 +62,7 @@ class HeaderCell(Cell):
 
     __slots__ = ["size", "name", "is_first"]
 
-    def __init__(self, name: str) -> str:
+    def __init__(self, name: str) -> None:
         super().__init__()
         self.size = 0
         self.name = name
