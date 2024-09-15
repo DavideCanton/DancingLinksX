@@ -1,5 +1,10 @@
 """N-queens solver using Dancing Links."""
 
+from pathlib import Path  # noqa: I001
+import sys
+
+sys.path.append(str(Path(__file__).parent.parent.resolve()))
+
 from dlx import AlgorithmX, DancingLinksMatrix
 
 __author__ = "Davide Canton"
@@ -65,7 +70,7 @@ def print_solution_count():
 
 def main():
     """Main solver."""
-    size = 6
+    size = int(sys.argv[1])
 
     d = DancingLinksMatrix(get_names(size))
 
