@@ -1,3 +1,4 @@
+# ruff: noqa: PLR2004
 """Sudoku Board implementation."""
 
 import numpy as np
@@ -50,8 +51,7 @@ class SudokuBoard:
         """
         if self._valid_position(key):
             return self._board[key]
-        else:
-            raise ValueError("Invalid position")
+        raise ValueError("Invalid position")
 
     def __setitem__(self, key, value):
         """Sets the item at position key.

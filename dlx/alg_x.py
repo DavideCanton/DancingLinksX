@@ -25,7 +25,10 @@ class AlgorithmX:
     choose_min: bool
 
     def __init__(
-        self, matrix: DancingLinksMatrix, callback: SolveCallback, choose_min: bool = True
+        self,
+        matrix: DancingLinksMatrix,
+        callback: SolveCallback,
+        choose_min: bool = True,
     ) -> None:
         """Creates an Algorithm_X object that solves the problem encoded in matrix.
 
@@ -83,10 +86,10 @@ class AlgorithmX:
                 return
 
             # uncover columns
-            row = self.sol_dict[k]
-            col = row.C
+            sol_row = self.sol_dict[k]
+            col = sol_row.C
 
-            for j in iterate_cell(row, "L"):
+            for j in iterate_cell(sol_row, "L"):
                 self.matrix.uncover(j.C)
 
         self.matrix.uncover(col)

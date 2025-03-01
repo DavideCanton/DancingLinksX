@@ -34,7 +34,7 @@ class Cell:
     C: HeaderCell
     indexes: tuple[int, int]
 
-    __slots__ = list("UDLRC") + ["indexes"]
+    __slots__ = ["C", "D", "L", "R", "U", "indexes"]
 
     def __init__(self) -> None:
         self.U = self.D = self.L = self.R = self
@@ -59,7 +59,7 @@ class HeaderCell(Cell):
     size: int
     is_first: bool
 
-    __slots__ = ["size", "name", "is_first"]
+    __slots__ = ["is_first", "name", "size"]
 
     def __init__(self, name: str, index: int) -> None:
         super().__init__()
