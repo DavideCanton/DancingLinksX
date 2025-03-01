@@ -1,5 +1,16 @@
-[tool.black]
-line-length = 100
+[project]
+name = "dlx"
+version = "0.1.0"
+description = "Pure python implementation of Dancing Links and Algorithm X"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = []
+
+[project.optional-dependencies]
+examples = ["numpy>=2.2.3"]
+
+[dependency-groups]
+dev = ["mypy>=1.15.0", "pre-commit>=4.1.0", "ruff>=0.9.9", "pdbp>=1.6.1"]
 
 [tool.ruff]
 line-length = 100

@@ -1,6 +1,7 @@
 """Sudoku Solver using Dancing Links."""
 
 import itertools as it
+import sys
 
 import numpy as np
 
@@ -98,7 +99,7 @@ def to_np(known):
     """Converts a sparse matrix dict into a numpy array."""
     matrix = np.zeros((9, 9), dtype=np.uint8)
 
-    for ((i, j), v) in known.items():
+    for (i, j), v in known.items():
         matrix[i - 1, j - 1] = v
 
     return matrix
@@ -108,7 +109,7 @@ def main():
     """Main solver."""
     matrix = DancingLinksMatrix(column_names())
 
-    known = read_from_file("./initial_board.txt")
+    known = read_from_file(sys.argv[1])
     # starting_board = SudokuBoard(to_np(known))
     # print(starting_board)
 
@@ -128,8 +129,7 @@ def main():
 
     try:
         alg = AlgorithmX(matrix, sol)
-        alg()
-
+        alg.solve()
         board = SudokuBoard(sol.sol)
         print(board)
         print(board.valid())

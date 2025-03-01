@@ -83,7 +83,7 @@ def main():
 
     p = PrintFirstSol(size)
     alg = AlgorithmX(d, p)
-    alg()
+    alg.solve()
 
 
 if __name__ == "__main__":

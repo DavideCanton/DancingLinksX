@@ -1,16 +1,14 @@
 """Implementation of Donald Knuth's Dancing Links Sparse Matrix.
 
-It uses a circular doubly linked list. 
+It uses a circular doubly linked list.
 See http://arxiv.org/abs/cs/0011047.
 """
 
 from __future__ import annotations
 
 import random
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 from typing import Literal, Self
-
-import numpy as np
 
 __author__ = "Davide Canton"
 
@@ -29,19 +27,17 @@ class Cell:
     It stores 4 pointers to neighbors, a pointer to the column header and the indexes associated.
     """
 
-    U: Self
-    D: Self
-    L: Self
-    R: Self
-    C: HeaderCell | None
-    indexes: tuple[int, int] | None
+    U: Cell
+    D: Cell
+    L: Cell
+    R: Cell
+    C: HeaderCell
+    indexes: tuple[int, int]
 
     __slots__ = list("UDLRC") + ["indexes"]
 
     def __init__(self) -> None:
         self.U = self.D = self.L = self.R = self
-        self.C = None
-        self.indexes = None
 
     def __str__(self) -> str:
         return f"Node: {self.indexes}"
@@ -56,17 +52,27 @@ class HeaderCell(Cell):
     This is a special cell that stores also a ``name`` and a ``size`` member.
     """
 
-    size: int
+    L: HeaderCell
+    R: HeaderCell
+
     name: str
+    size: int
     is_first: bool
 
     __slots__ = ["size", "name", "is_first"]
 
-    def __init__(self, name: str) -> None:
+    def __init__(self, name: str, index: int) -> None:
         super().__init__()
-        self.size = 0
         self.name = name
+        self.indexes = (-1, index)
+        self.size = 0
         self.is_first = False
+
+    @classmethod
+    def First(cls) -> Self:
+        header = cls("<H>", -1)
+        header.is_first = True
+        return header
 
 
 class DancingLinksMatrix:
@@ -80,9 +86,10 @@ class DancingLinksMatrix:
     header: HeaderCell
     rows: int
     cols: int
-    col_list: list[HeaderCell] | None
+    col_list: list[HeaderCell]
+    done: bool = False
 
-    def __init__(self, columns: int | Iterable[str]):
+    def __init__(self, columns: int | Iterable[str]) -> None:
         """Creates a DL_Matrix.
 
         :param columns: it can be an integer or an iterable. If columns is an
@@ -96,29 +103,16 @@ class DancingLinksMatrix:
                         assumed that the column is a primary one.
         :raises TypeError, if columns is not a number neither an iterable.
         """
-        self.header = HeaderCell("<H>")
-        self.header.is_first = True
+        self.header = HeaderCell.First()
         self.rows = self.cols = 0
         self.col_list = []
         self._create_column_headers(columns)
 
-    def _create_column_headers(self, columns: int | Iterable[str | tuple[str, bool]]):
-        if isinstance(columns, int):
-            columns = int(columns)
-            column_names = (f"C{i}" for i in range(columns))
-        else:
-            column_names = columns
-
+    def _create_column_headers(self, columns: int | Iterable[str | tuple[str, bool]]) -> None:
         prev = self.header
         # links every column in a for loop
-        for name in column_names:
-            if isinstance(name, tuple):
-                name, primary = name
-            else:
-                primary = True
-            cell = HeaderCell(name)
-            cell.indexes = (-1, self.cols)
-            cell.is_first = False
+        for name, primary in _normalize(columns):
+            cell = HeaderCell(name, self.cols)
             self.col_list.append(cell)
             if primary:
                 prev.R = cell
@@ -129,7 +123,7 @@ class DancingLinksMatrix:
         prev.R = self.header
         self.header.L = prev
 
-    def add_sparse_row(self, row: list[int], already_sorted=False):
+    def add_sparse_row(self, row: list[int], already_sorted=False) -> None:
         """Adds a sparse row to the matrix.
 
         The row is in format
@@ -142,7 +136,7 @@ class DancingLinksMatrix:
                                optimization.
         :raises CannotAddRowsError if end_add was already called.
         """
-        if self.col_list is None:
+        if self.done:
             raise CannotAddRowsError()
 
         prev = None
@@ -174,6 +168,9 @@ class DancingLinksMatrix:
             col.size += 1
             prev = cell
 
+        assert cell
+        assert start
+
         start.L = cell
         cell.R = start
         self.rows += 1
@@ -183,7 +180,8 @@ class DancingLinksMatrix:
 
         Not strictly necessary, but it can save some memory.
         """
-        self.col_list = None
+        self.done = True
+        self.col_list.clear()
 
     def min_column(self) -> HeaderCell:
         """Returns the column header of the column with the minimum number of 1s.
@@ -196,8 +194,9 @@ class DancingLinksMatrix:
 
         col_min = self.header.R
 
-        col: HeaderCell
         for col in iterate_cell(self.header, "R"):
+            # R of header cell is a header cell
+            assert isinstance(col, HeaderCell)
             if not col.is_first and col.size < col_min.size:
                 col_min = col
 
@@ -224,24 +223,6 @@ class DancingLinksMatrix:
             col = col.R
         return col
 
-    def __str__(self):
-        names = []
-        m = np.zeros((self.rows, self.cols), dtype=np.uint8)
-        rows, cols = set(), []
-
-        col: HeaderCell
-        for col in iterate_cell(self.header, "R"):
-            cols.append(col.indexes[1])
-            names.append(col.name)
-
-            for cell in iterate_cell(col, "D"):
-                ind = cell.indexes
-                rows.add(ind[0])
-                m[ind] = 1
-
-        m = m[list(rows)][:, cols]
-        return "\n".join([", ".join(names), str(m)])
-
     @staticmethod
     def cover(col: HeaderCell) -> None:
         """Covers the column ``col``.
@@ -261,7 +242,7 @@ class DancingLinksMatrix:
                 j.C.size -= 1
 
     @staticmethod
-    def uncover(c: HeaderCell) -> None:
+    def uncover(col: HeaderCell) -> None:
         """Uncovers the column c.
 
         It is done by re-adding the 1s in the column and also all
@@ -269,12 +250,26 @@ class DancingLinksMatrix:
 
         :param c: The column header of the column that has to be uncovered.
         """
-        for i in iterate_cell(c, "U"):
+        for i in iterate_cell(col, "U"):
             for j in iterate_cell(i, "L"):
                 j.C.size += 1
                 j.D.U = j.U.D = j
 
-        c.R.L = c.L.R = c
+        col.R.L = col.L.R = col
+
+
+def _normalize(
+    columns: int | Iterable[str | tuple[str, bool]],
+) -> Iterable[tuple[str, bool]]:
+    if isinstance(columns, int):
+        for i in range(columns):
+            yield (f"C{i}", True)
+    else:
+        for t in columns:
+            if isinstance(t, str):
+                yield (t, True)
+            else:
+                yield t
 
 
 def iterate_cell(cell: Cell, direction: Literal["U", "D", "L", "R"]) -> Iterable[Cell]:
@@ -284,74 +279,50 @@ def iterate_cell(cell: Cell, direction: Literal["U", "D", "L", "R"]) -> Iterable
         cur = getattr(cur, direction)
 
 
+def iterate_headers(cell: HeaderCell, direction: Literal["L", "R"]) -> Iterable[HeaderCell]:
+    for c in iterate_cell(cell, direction):
+        assert isinstance(c, HeaderCell)
+        yield c
+
+
 # TODO to be completed
 class MatrixDisplayer:
-    def __init__(self, matrix):
-        dic = {}
+    cells: Mapping[tuple[int, int], Cell]
+    headers: Mapping[int, HeaderCell]
 
-        for col in iterate_cell(matrix.header, "R"):
-            dic[col.indexes] = col
+    def __init__(self, matrix: DancingLinksMatrix) -> None:
+        cells = {}
+        headers = {}
 
-        for col in iterate_cell(matrix.header, "R"):
+        for col in iterate_headers(matrix.header, "R"):
+            headers[col.indexes[1]] = col
+
+        for col in iterate_headers(matrix.header, "R"):
             first = col.D
-            dic[first.indexes] = first
+            cells[first.indexes] = first
             for cell in iterate_cell(first, "D"):
                 if cell is not col:
-                    dic[cell.indexes] = cell
+                    cells[cell.indexes] = cell
 
-        self.dic = dic
+        self.cells = cells
+        self.headers = headers
         self.rows = matrix.rows
         self.cols = matrix.cols
 
-    def print_matrix(self):
+    def print_matrix(self) -> None:
         m = {}
 
         for i in range(-1, self.rows):
-            for j in range(0, self.cols):
-                cell = self.dic.get((i, j))
-                if cell:
-                    if i == -1:
-                        m[0, 2 * j] = cell.name
-                    else:
+            if i == -1:
+                for j in range(0, self.cols):
+                    header = self.headers[j]
+                    m[0, 2 * j] = header.name
+            else:
+                for j in range(0, self.cols):
+                    if (i, j) in self.cells:
                         m[2 * (i + 1), 2 * j] = "X"
 
         for i in range(-1, self.rows * 2):
             for j in range(0, self.cols * 2):
                 print(m.get((i, j), " "), end="")
             print()
-
-
-def _from_dense(row):
-    return [i for i, el in enumerate(row) if el]
-
-
-if __name__ == "__main__":
-    r = [
-        _from_dense([1, 0, 0, 1, 0, 0, 1]),
-        _from_dense([1, 0, 0, 1, 0, 0, 0]),
-        _from_dense([0, 0, 0, 1, 1, 0, 1]),
-        _from_dense([0, 0, 1, 0, 1, 1, 0]),
-        _from_dense([0, 1, 1, 0, 0, 1, 1]),
-        _from_dense([0, 1, 0, 0, 0, 0, 1]),
-    ]
-
-    d = DancingLinksMatrix("1234567")
-
-    for row in r:
-        d.add_sparse_row(row, already_sorted=True)
-    d.end_add()
-
-    p = MatrixDisplayer(d)
-    p.print_matrix()
-
-    # print(d.rows)
-    # print(d.cols)
-    # print(d)
-
-    mc = d.min_column()
-    # print(mc)
-
-    d.cover(mc)
-    # print(d)
-
-    p.print_matrix()

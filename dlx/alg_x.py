@@ -3,30 +3,30 @@
 See http://arxiv.org/abs/cs/0011047.
 """
 
-import string
-from collections import abc
-from collections.abc import Callable
+from collections.abc import Mapping, Sequence
+from typing import Protocol
 
 from .dlmatrix import Cell, DancingLinksMatrix, iterate_cell
 
 __author__ = "Davide Canton"
 
 
-class AlgorithmX(abc.Callable):
+class SolveCallback(Protocol):
+    def __call__(self, solution: Mapping[int, Sequence[str]]) -> bool: ...
+
+
+class AlgorithmX:
     """Callable object implementing the Algorithm X."""
 
     sol_dict: dict[int, Cell]
     stop: bool
     matrix: DancingLinksMatrix
-    callback: Callable[[dict[int, list[str]]], bool]
+    callback: SolveCallback
     choose_min: bool
 
     def __init__(
-        self,
-        matrix: DancingLinksMatrix,
-        callback: Callable[[dict[int, list[str]]], bool],
-        choose_min=True,
-    ):
+        self, matrix: DancingLinksMatrix, callback: SolveCallback, choose_min: bool = True
+    ) -> None:
         """Creates an Algorithm_X object that solves the problem encoded in matrix.
 
         Args:
@@ -46,11 +46,11 @@ class AlgorithmX(abc.Callable):
         self.callback = callback
         self.choose_min = choose_min
 
-    def __call__(self):
+    def solve(self) -> None:
         """Starts the search."""
         self._search(0)
 
-    def _search(self, k: int):
+    def _search(self, k: int) -> None:
         # print(f"Size: {k}")
         # print(f"Solution: {self.sol_dict}")
         # print("Matrix:")
@@ -91,46 +91,14 @@ class AlgorithmX(abc.Callable):
 
         self.matrix.uncover(col)
 
-    def _create_sol(self, k: int) -> dict[int, list[str]]:
+    def _create_sol(self, k: int) -> Mapping[int, Sequence[str]]:
         # creates a solution from the inner dict
         sol = {}
+
         for key, row in self.sol_dict.items():
             if key >= k:
                 continue
 
-            tmp_list = [row.C.name]
-            tmp_list.extend(r.C.name for r in iterate_cell(row, "R"))
-            sol[row.indexes[0]] = tmp_list
+            sol[row.indexes[0]] = [row.C.name] + [r.C.name for r in iterate_cell(row, "R")]
 
         return sol
-
-
-def _from_dense(row):
-    return [i for i, el in enumerate(row) if el]
-
-
-def main():
-    """Main."""
-    rows = [
-        _from_dense([0, 0, 1, 0, 1, 1, 0]),
-        _from_dense([1, 0, 0, 1, 0, 0, 1]),
-        _from_dense([0, 1, 1, 0, 0, 1, 0]),
-        _from_dense([1, 0, 0, 1, 0, 0, 0]),
-        _from_dense([0, 1, 0, 0, 0, 0, 1]),
-        _from_dense([0, 0, 0, 1, 1, 0, 1]),
-    ]
-
-    size = max(max(rows, key=max)) + 1
-
-    d = DancingLinksMatrix(string.ascii_uppercase[:size])
-
-    for row in rows:
-        d.add_sparse_row(row, already_sorted=True)
-
-    # print(d)
-
-    AlgorithmX(d, print)()
-
-
-if __name__ == "__main__":
-    main()

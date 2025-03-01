@@ -1,3 +1,10 @@
 {
-    "python.formatting.provider": "black"
+    "[python]": {
+        "editor.defaultFormatter": "charliermarsh.ruff",
+        "editor.formatOnSave": true
+    },
+    "[toml]": {
+        "editor.defaultFormatter": "bodil.prettier-toml"
+    },
+    "ruff.importStrategy": "fromEnvironment"
 }

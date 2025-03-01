@@ -1,6 +1,0 @@
--c requirements-freeze.txt
-black>=22.10.0
-click==8.1.3
-pip-tools==6.12.1
-pre-commit==2.19.0
-ruff>=0.0.251
