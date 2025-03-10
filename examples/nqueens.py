@@ -1,7 +1,7 @@
 """N-queens solver using Dancing Links."""
 
-from pathlib import Path  # noqa: I001
 import sys
+from pathlib import Path
 
 sys.path.append(str(Path(__file__).parent.parent.resolve()))
 

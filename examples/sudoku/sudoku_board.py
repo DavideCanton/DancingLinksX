@@ -25,14 +25,6 @@ class SudokuBoard:
         self.squares = as_strided(self._board, shape=(3, 3, 3, 3), strides=(27, 3, 9, 1))
 
     @property
-    def all_filled(self) -> bool:
-        """Returns True if there are no empty cells.
-
-        :return: True if all the cells are filled.
-        """
-        return np.count_nonzero(self._board) == 81
-
-    @property
     def board(self) -> np.ndarray:
         """Returns the underlying board object."""
         return self._board
